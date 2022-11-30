@@ -3,12 +3,13 @@ bool RenderingDisabled = false;
 SDL_bool SDL_RenderLoop = SDL_FALSE;
 void SDL2_GL_CreateWindow(int w, int h) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL 2", SDL_GetError(), NULL);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", SDL_GetError(), NULL);
     }
     int window_renderer_combo = SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &SDL_window, &SDL_renderer);
     if (window_renderer_combo == -1) {
 
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", "Failed to create SDL 2 Window and Renderer", NULL);
+        //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", "Failed to create SDL 2 Window and Renderer", NULL);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project(Window Creation)",SDL_GetError(), NULL);
 #ifdef __CLIENT_BUILD
         GetCommandInput();
 #endif
@@ -20,11 +21,11 @@ void SDL2_GL_CreateWindow(int w, int h) {
 
         if (SDL_context == NULL) {
 
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", "Failed to create a SDL 2 OpenGL Context!", NULL);
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project(GL Context Creation)", SDL_GetError(), NULL);
 
         }
         if (SDL_GL_MakeCurrent(SDL_window, SDL_context) != 0) {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", "Failed to make OpenGL Current!", NULL);
+            //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", "Failed to make OpenGL Current!", NULL);
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", SDL_GetError(), NULL);
 #ifdef __CLIENT_BUILD
             GetCommandInput();
