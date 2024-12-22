@@ -137,8 +137,8 @@ void SDL2_GL_RenderLoop() {
 
                 }
 #endif
-                input_func(SDL_event);
-
+                //input_func(SDL_event);
+                SDL_AddEventWatch(event_watch_func,NULL);
                 if (SDL_event.type == SDL_WINDOWEVENT) {
                     if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 
@@ -158,13 +158,13 @@ void SDL2_GL_Restart() {
         SDL2_GL_RenderLoop();
 }
 
-void SDL2_GL_CreateWindowWithCallback(int w, int h, Init_Func* main_init_func, Main_Render_Func* main_render_func, Main_Input_Func* main_input_func, Main_Update_Func* main_update_func) {
+void SDL2_GL_CreateWindowWithCallback(int w, int h, Init_Func* main_init_func, Main_Render_Func* main_render_func, SDL_EventFilter* main_event_watch_func, Main_Update_Func* main_update_func) {
         if (main_init_func != NULL) {
             SetInitCallback(main_init_func);
         }
         SetMainRenderCallback(main_render_func);
         SetMainUpdateCallback(main_update_func);
-        SetMainInputCallback(main_input_func);
+        SetMainEventWatchCallback(main_event_watch_func);
         SDL2_GL_CreateWindow(w, h);
         SDL2_GL_RenderLoop();
 }
