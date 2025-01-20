@@ -3,5 +3,5 @@
 #undef main
 
 int main(){
-	SDL2_GL_CreateWindowWithCallback(640, 480, Main_Init, Main_Render, Main_Input, Main_Update);
+	SDL2_GL_CreateWindowWithCallback(640, 480, Main_Init, Main_Render, Main_EventWatch, Main_Update);
 }
