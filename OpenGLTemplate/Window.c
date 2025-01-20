@@ -52,6 +52,6 @@ void SetDebugRenderCallback(Main_Render_Func* main_debug_render_func) {
 void SetDebugUpdateCallback(Main_Update_Func* main_debug_update_func) {
 	debug_update_func = main_debug_update_func;
 }
-void SetMainInputCallback(SDL_EventFilter* main_event_watch_func) {
+void SetMainEventWatchCallback(SDL_EventFilter* main_event_watch_func) {
 	event_watch_func = main_event_watch_func;
 }
