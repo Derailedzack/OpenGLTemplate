@@ -1,6 +1,35 @@
 #include"SDL2_GLWindow.h"
 bool RenderingDisabled = false;
 SDL_bool SDL_RenderLoop = SDL_FALSE;
+void SDL2_CreateWindow(int w, int h, SDL_bool use_gl) {
+    if (use_gl == SDL_TRUE) {
+        SDL2_GL_CreateWindow(w, h);
+    }
+    else {
+        if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", SDL_GetError(), NULL);
+        }
+        int window_renderer_combo = SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_RESIZABLE, &SDL_window, &SDL_renderer);
+        if (window_renderer_combo == -1) {
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project(Window Creation)", SDL_GetError(), NULL);
+        }
+        else {
+
+          
+            Current_window = SDL;
+            if (init_func != NULL) {
+                init_func();
+            }
+
+
+
+            SDL_RenderLoop = SDL_TRUE;
+            render_func();
+            //}
+
+        }
+    }
+}
 void SDL2_GL_CreateWindow(int w, int h) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Project", SDL_GetError(), NULL);
@@ -75,18 +104,12 @@ void SDL2_GL_RenderLoop() {
         }
         else {
 
-#ifdef __CLIENT_BUILD
-            RenderALLEntities();
-#endif
             render_func();
             // }
 
             //
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#ifdef __CLIENT_BUILD
-            UpdateALLEntities();
-#endif
+
             update_func();
             //SDL_GL_SetSwapInterval(1);
 
@@ -103,41 +126,7 @@ void SDL2_GL_RenderLoop() {
             //if(SDL_ONLY_DEBUG_DRAW == SDL_TRUE ){
 
             //}else{
-#ifdef __CLIENT_BUILD
-            if (SDL_event.type == SDL_KEYDOWN) {
-                if (SDL_event.key.keysym.sym == SDLK_RIGHT) {
-                    SDL2_OnPlayerMove(1);
-                    Player_data->posX += 0.222225f;
-                }
-                if (SDL_event.key.keysym.sym == SDLK_LEFT) {
-                    SDL2_OnPlayerMove(1);
-                    Player_data->posX -= 0.222225f;
-                }
-                if (SDL_event.key.keysym.sym == SDLK_UP) {
-                    SDL2_OnPlayerMove(0);
-                    prev_ypos = Player_data->posY;
-                    Player_data->posY += 0.222225f;
-                }
-                if (SDL_event.key.keysym.sym == SDLK_DOWN) {
-                    SDL2_OnPlayerMove(0);
-                    prev_ypos = Player_data->posY;
-                    Player_data->posY -= 0.222225f;
-                }
-                if (SDL_event.key.keysym.sym == SDLK_SPACE) {
-                    RenderingDisabled = true;
-                    SDL_HideWindow(SDL_window);
-
-                    GetCommandInput();
-
-                    /*Player_data->posY -= 0.06f;
-                    delay++;
-                    if(delay >= 60){
-                       Player_data->posY = prev_ypos;
-                    }*/
-
-                }
-#endif
-                //input_func(SDL_event);
+  //input_func(SDL_event);
                 SDL_AddEventWatch(event_watch_func,NULL);
                 if (SDL_event.type == SDL_WINDOWEVENT) {
                     if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
@@ -148,7 +137,57 @@ void SDL2_GL_RenderLoop() {
                 }
             }
         }
+}
+void SDL2_RenderLoop() {
+    float prev_ypos;
+    int delay;
+    while (SDL_RenderLoop == SDL_TRUE) {
+        SDL_PollEvent(&SDL_event);
+
+        
+  //  if(SDL_ONLY_DEBUG_DRAW == SDL_TRUE ){
+        //RenderALLDebugObjects();
+        //UpdateALLDebugObjects();
+  //  }else{
+        if (RenderingDisabled == true) {
+            SDL_RenderLoop = false;
+            //
+        }
+        else {
+            SDL_RenderClear(SDL_renderer);
+            render_func();
+            // }
+            SDL_RenderPresent(SDL_renderer);
+            //
+
+
+            update_func();
+            //SDL_GL_SetSwapInterval(1);
+
+
+
+
+
+            if (SDL_event.type == SDL_QUIT) {
+
+                SDL_RenderLoop = SDL_FALSE;
+                SDL_Quit();
+            }
+            //if(SDL_ONLY_DEBUG_DRAW == SDL_TRUE ){
+
+            //}else{
+  //input_func(SDL_event);
+            SDL_AddEventWatch(event_watch_func, NULL);
+            if (SDL_event.type == SDL_WINDOWEVENT) {
+                if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+
+                 
+
+                }
+            }
+        }
     }
+}
 
 void SDL2_GL_Restart() {
         RenderingDisabled = false; //Clear rendering disabled
@@ -158,15 +197,22 @@ void SDL2_GL_Restart() {
         SDL2_GL_RenderLoop();
 }
 
-void SDL2_GL_CreateWindowWithCallback(int w, int h, Init_Func* main_init_func, Main_Render_Func* main_render_func, SDL_EventFilter* main_event_watch_func, Main_Update_Func* main_update_func) {
+void SDL2_CreateWindowWithCallback(int w, int h, SDL_bool use_gl, Init_Func* main_init_func, Main_Render_Func* main_render_func, SDL_EventFilter* main_event_watch_func, Main_Update_Func* main_update_func) {
         if (main_init_func != NULL) {
             SetInitCallback(main_init_func);
         }
         SetMainRenderCallback(main_render_func);
         SetMainUpdateCallback(main_update_func);
         SetMainEventWatchCallback(main_event_watch_func);
-        SDL2_GL_CreateWindow(w, h);
-        SDL2_GL_RenderLoop();
+        SDL2_CreateWindow(w, h,use_gl);
+        if (use_gl == SDL_TRUE) {
+          
+            SDL2_GL_RenderLoop();
+        }
+        else {
+            SDL2_RenderLoop();
+        }
+      
 }
 
 void SDL2_GL_DrawPixel(float w, float h, float x, float y, float x2, float y2) {
